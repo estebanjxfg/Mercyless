@@ -169,3 +169,4 @@ public class ConfiguracionControles extends JFrame {
         usarWASD = !usarWASD;
     }
 }
+// hola papus, me olvide en cambiar el nombre del commit xdxdxd
