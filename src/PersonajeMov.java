@@ -345,4 +345,5 @@ public class PersonajeMov extends JPanel implements KeyListener, Runnable {
         frame.setVisible(true);
     }
 }
-// prueba paput
+// prueba paputtttt
+// otra prueba de papus
