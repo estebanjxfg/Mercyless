@@ -4,42 +4,26 @@ import javax.swing.*;
 
 public class MercylessMenu extends JFrame {
 
-    // =========================
-    // PANEL MENÚ
-    // =========================
     private JPanel menuPanel;
 
-    // =========================
-    // BOTONES
-    // =========================
     private JButton btnPlay;
     private JButton btnOptions;
     private JButton btnCredits;
+    
+    // IMÁGENES PLAY
+    private ImageIcon playNormal;
+    private ImageIcon playHover;
+    private ImageIcon playClick;
 
-    // =========================
-    // PANTALLA COMPLETA
-    // =========================
     private boolean pantallaCompleta = false;
 
-    // =========================
-    // CONSTRUCTOR
-    // =========================
     public MercylessMenu() {
 
-        // =========================
-        // CONFIGURACIÓN VENTANA
-        // =========================
         setTitle("Mercyless");
-
         setSize(1366, 768);
-
         setLocationRelativeTo(null);
-
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // =========================
-        // PANEL MENÚ
-        // =========================
         menuPanel = new JPanel() {
 
             Image fondo = new ImageIcon(
@@ -48,113 +32,67 @@ public class MercylessMenu extends JFrame {
 
             @Override
             protected void paintComponent(Graphics g) {
-
                 super.paintComponent(g);
-
-                // Fondo adaptado
-                g.drawImage(
-                        fondo,
-                        0,
-                        0,
-                        getWidth(),
-                        getHeight(),
-                        this
-                );
+                g.drawImage(fondo, 0, 0, getWidth(), getHeight(), this);
             }
         };
 
         menuPanel.setLayout(null);
 
-        // =========================
-        // CREAR BOTONES
-        // =========================
         btnPlay = crearBotonInvisible();
-
         btnOptions = crearBotonInvisible();
-
         btnCredits = crearBotonInvisible();
 
-        // =========================
-        // AGREGAR BOTONES
-        // =========================
         menuPanel.add(btnPlay);
-
         menuPanel.add(btnOptions);
-
         menuPanel.add(btnCredits);
 
-        // =========================
-        // POSICIONES BOTONES
-        // =========================
         actualizarBotones();
 
-        // =========================
-        // AJUSTAR AL REDIMENSIONAR
-        // =========================
         addComponentListener(new ComponentAdapter() {
-
             @Override
             public void componentResized(ComponentEvent e) {
-
                 actualizarBotones();
             }
         });
 
         // =========================
-// BOTÓN PLAY
-// =========================
-btnPlay.addActionListener(new ActionListener() {
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-        // Crear escenario
-        Escenario1 juego =
-                new Escenario1(MercylessMenu.this);
-
-        // Cambiar contenido
-        setContentPane(juego);
-
-        revalidate();
-
-        repaint();
-
-        // Dar foco
-        juego.requestFocusInWindow();
-    }
-});
-
+        // CLICK PLAY
         // =========================
-        // BOTÓN OPTIONS
-        // =========================
-        btnOptions.addActionListener(new ActionListener() {
+        btnPlay.addActionListener(e -> {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
+            Escenario1 juego = new Escenario1(MercylessMenu.this);
 
-                ConfiguracionControles config =
-                        new ConfiguracionControles(
-                                MercylessMenu.this
-                        );
+            setContentPane(juego);
+            revalidate();
+            repaint();
 
-                config.setVisible(true);
-
-                setVisible(false);
-            }
+            juego.requestFocusInWindow();
         });
 
         // =========================
-        // BOTÓN CREDITS
+        // HOVER / CLICK EFFECT PLAY
         // =========================
-        btnCredits.addActionListener(new ActionListener() {
+        btnPlay.addMouseListener(new MouseAdapter() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void mouseEntered(MouseEvent e) {
+                btnPlay.setIcon(playHover);
+            }
 
-                JOptionPane.showMessageDialog(
-                        null,
-                        "MERCYLESS\n\nDesarrollado por Pandilla Momera Studios 😎"
-                );
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnPlay.setIcon(playNormal);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                btnPlay.setIcon(playClick);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                btnPlay.setIcon(playHover);
             }
         });
 
@@ -166,65 +104,26 @@ btnPlay.addActionListener(new ActionListener() {
             @Override
             public void keyPressed(KeyEvent e) {
 
-                // =========================
-                // F4 PANTALLA COMPLETA
-                // =========================
                 if (e.getKeyCode() == KeyEvent.VK_F4) {
 
                     pantallaCompleta = !pantallaCompleta;
 
                     if (pantallaCompleta) {
-
-                        // Pantalla completa
                         setExtendedState(JFrame.MAXIMIZED_BOTH);
-
                     } else {
-
-                        // Ventana normal
                         setExtendedState(JFrame.NORMAL);
-
                         setSize(1366, 768);
-
                         setLocationRelativeTo(null);
                     }
 
                     actualizarBotones();
-                }
-
-                // =========================
-                // F3 CAMBIAR CONTROLES
-                // =========================
-                if (e.getKeyCode() == KeyEvent.VK_F3) {
-
-                    ConfiguracionControles.cambiarControles();
-
-                    String modo;
-
-                    if (ConfiguracionControles.usarWASD) {
-
-                        modo = "WASD";
-
-                    } else {
-
-                        modo = "FLECHAS";
-                    }
-
-                    JOptionPane.showMessageDialog(
-                            null,
-                            "Controles actuales: " + modo
-                    );
                 }
             }
         });
 
         setFocusable(true);
 
-        // =========================
-        // MOSTRAR MENÚ
-        // =========================
         setContentPane(menuPanel);
-
-        // IMPORTANTE
         requestFocusInWindow();
     }
 
@@ -233,81 +132,58 @@ btnPlay.addActionListener(new ActionListener() {
     // =========================
     private JButton crearBotonInvisible() {
 
-        JButton boton = new JButton();
-
-        boton.setOpaque(false);
-
-        boton.setContentAreaFilled(false);
-
-        boton.setBorderPainted(false);
-
-        boton.setFocusPainted(false);
-
-        boton.setCursor(
-                new Cursor(Cursor.HAND_CURSOR)
-        );
-
-        return boton;
+        JButton b = new JButton();
+        b.setOpaque(false);
+        b.setContentAreaFilled(false);
+        b.setBorderPainted(false);
+        b.setFocusPainted(false);
+        b.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return b;
     }
 
     // =========================
-    // POSICIONES BOTONES
+    // ESCALAR IMAGEN
+    // =========================
+    private ImageIcon escalarIcon(String ruta, int ancho, int alto) {
+
+        Image img = new ImageIcon(getClass().getResource(ruta))
+                .getImage()
+                .getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
+
+        return new ImageIcon(img);
+    }
+
+    // =========================
+    // POSICIONES + IMÁGENES
     // =========================
     private void actualizarBotones() {
 
         int ancho = getWidth();
-
         int alto = getHeight();
 
-        int x = (int) (ancho * 0.16);
+        int x = (int) (ancho * 0.08);
 
-        int anchoBoton = (int) (ancho * 0.28);
+        int anchoBoton = (int) (ancho * 0.31);
+        int altoBoton = (int) (alto * 0.12);
 
-        int altoBoton = (int) (alto * 0.11);
+        btnPlay.setBounds(x, (int)(alto * 0.41), anchoBoton, altoBoton);
+        btnOptions.setBounds(x, (int)(alto * 0.61), anchoBoton, altoBoton);
+        btnCredits.setBounds(x, (int)(alto * 0.75), anchoBoton, altoBoton);
 
-        int yPlay = (int) (alto * 0.47);
+        // =========================
+        // CARGA IMÁGENES ESCALADAS
+        // =========================
+        playNormal = escalarIcon("/MenuBot/play_normal.png", anchoBoton, altoBoton);
+        playHover  = escalarIcon("/MenuBot/play_hover.png", anchoBoton, altoBoton);
+        playClick  = escalarIcon("/MenuBot/play_click.png", anchoBoton, altoBoton);
 
-        int yOptions = (int) (alto * 0.61);
-
-        int yCredits = (int) (alto * 0.75);
-
-        // PLAY
-        btnPlay.setBounds(
-                x,
-                yPlay,
-                anchoBoton,
-                altoBoton
-        );
-
-        // OPTIONS
-        btnOptions.setBounds(
-                x,
-                yOptions,
-                anchoBoton,
-                altoBoton
-        );
-
-        // CREDITS
-        btnCredits.setBounds(
-                x,
-                yCredits,
-                anchoBoton,
-                altoBoton
-        );
+        btnPlay.setIcon(playNormal);
     }
 
     // =========================
     // MAIN
     // =========================
     public static void main(String[] args) {
-
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-
-                new MercylessMenu().setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(() -> new MercylessMenu().setVisible(true));
     }
 }

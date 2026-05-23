@@ -4,7 +4,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
-public class Escenario1 extends JPanel implements KeyListener, Runnable {
+public class Escenario2 extends JPanel implements KeyListener, Runnable {
 
     JFrame frame;
 
@@ -12,22 +12,13 @@ public class Escenario1 extends JPanel implements KeyListener, Runnable {
 
     BufferedImage background;
 
-    boolean fullscreen = false;
-
     // =========================
-    // PUERTA
+    // CÁMARA
     // =========================
-    Rectangle puerta = new Rectangle(900, 300, 120, 160);
+    double cameraX = 0;
+    double cameraY = 0;
 
-    boolean cercaPuerta = false;
-
-    // =========================
-    // FADE SYSTEM
-    // =========================
-    boolean fadeOut = false;
-    float fadeAlpha = 0f;
-
-    public Escenario1(JFrame frame) {
+    public Escenario2(JFrame frame) {
 
         this.frame = frame;
 
@@ -40,7 +31,7 @@ public class Escenario1 extends JPanel implements KeyListener, Runnable {
 
         try {
             background = ImageIO.read(
-                    getClass().getResource("/Sprites/Escenario1.jpeg")
+                    getClass().getResource("/Sprites/Escenario2.jpeg")
             );
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,7 +50,7 @@ public class Escenario1 extends JPanel implements KeyListener, Runnable {
         player.update();
 
         // =========================
-        // COLISIONES MAPA
+        // COLISIONES BORDES MAPA
         // =========================
         if (player.x < 60) player.x = 60;
         if (player.y < 160) player.y = 160;
@@ -71,47 +62,17 @@ public class Escenario1 extends JPanel implements KeyListener, Runnable {
             player.y = background.getHeight() - 310;
 
         // =========================
-        // HITBOX PLAYER
+        // CÁMARA
         // =========================
-        Rectangle playerHitbox = new Rectangle(
-                (int) player.x,
-                (int) player.y,
-                60,
-                60
-        );
+        cameraX = player.x - (getWidth() / 2.0);
+        cameraY = player.y - (getHeight() / 2.0);
 
-        cercaPuerta = playerHitbox.intersects(puerta);
-
-        // =========================
-        // FADE LOGIC
-        // =========================
-        if (fadeOut) {
-
-            fadeAlpha += 0.05f;
-
-            if (fadeAlpha >= 1f) {
-                fadeAlpha = 1f;
-                cambiarEscena();
-            }
-        }
+        cameraX = Math.max(0, Math.min(cameraX, background.getWidth() - getWidth()));
+        cameraY = Math.max(0, Math.min(cameraY, background.getHeight() - getHeight()));
     }
 
     // =========================
-    // CAMBIO DE ESCENA
-    // =========================
-    public void cambiarEscena() {
-
-        Escenario2 escena2 = new Escenario2(frame);
-
-        frame.setContentPane(escena2);
-        frame.revalidate();
-        frame.repaint();
-
-        escena2.requestFocusInWindow();
-    }
-
-    // =========================
-    // DIBUJO
+    // DIBUJO (UNDERTALE STYLE)
     // =========================
     @Override
     protected void paintComponent(Graphics g) {
@@ -120,10 +81,15 @@ public class Escenario1 extends JPanel implements KeyListener, Runnable {
 
         Graphics2D g2 = (Graphics2D) g;
 
-        // fondo negro (bordes estilo Undertale)
+        // =========================
+        // BORDES NEGROS (LETTERBOX)
+        // =========================
         g2.setColor(Color.BLACK);
         g2.fillRect(0, 0, getWidth(), getHeight());
 
+        // =========================
+        // ESCALAR MAPA
+        // =========================
         int bgW = background.getWidth();
         int bgH = background.getHeight();
 
@@ -137,31 +103,23 @@ public class Escenario1 extends JPanel implements KeyListener, Runnable {
         int drawX = (getWidth() - newW) / 2;
         int drawY = (getHeight() - newH) / 2;
 
-        // mapa
-        g2.drawImage(background, drawX, drawY, newW, newH, null);
+        // =========================
+        // APLICAR CÁMARA AL MUNDO
+        // =========================
+        int worldX = drawX - (int) cameraX;
+        int worldY = drawY - (int) cameraY;
 
-        // puerta (DEBUG rojo)
-        g2.setColor(Color.RED);
-        g2.drawRect(drawX + puerta.x, drawY + puerta.y, puerta.width, puerta.height);
-
-        // jugador
-        g2.drawImage(
-                player.currentSprite,
-                drawX + (int) player.x,
-                drawY + (int) player.y,
-                80,
-                80,
-                null
-        );
+        g2.drawImage(background, worldX, worldY, newW, newH, null);
 
         // =========================
-        // FADE NEGRO
+        // JUGADOR
         // =========================
-        if (fadeOut) {
+        int playerSize = (int) (164 * scale);
 
-            g2.setColor(new Color(0, 0, 0, fadeAlpha));
-            g2.fillRect(0, 0, getWidth(), getHeight());
-        }
+        int playerX = (int) (player.x - cameraX);
+        int playerY = (int) (player.y - cameraY);
+
+        g2.drawImage(player.currentSprite, playerX, playerY, playerSize, playerSize, null);
     }
 
     // =========================
@@ -193,15 +151,6 @@ public class Escenario1 extends JPanel implements KeyListener, Runnable {
         if (key == KeyEvent.VK_S) player.down = true;
         if (key == KeyEvent.VK_A) player.left = true;
         if (key == KeyEvent.VK_D) player.right = true;
-
-        // =========================
-        // INTERACCIÓN E
-        // =========================
-        if (key == KeyEvent.VK_E && cercaPuerta && !fadeOut) {
-            fadeOut = true;
-        }
-
-        if (key == KeyEvent.VK_F4) toggleFullscreen();
     }
 
     @Override
@@ -219,34 +168,23 @@ public class Escenario1 extends JPanel implements KeyListener, Runnable {
     public void keyTyped(KeyEvent e) {}
 
     // =========================
-    // FULLSCREEN
+    // MAIN (PRUEBA)
     // =========================
-    public void toggleFullscreen() {
+    public static void main(String[] args) {
 
-        GraphicsDevice device =
-                GraphicsEnvironment.getLocalGraphicsEnvironment()
-                        .getDefaultScreenDevice();
+        JFrame frame = new JFrame("Escenario 2");
 
-        fullscreen = !fullscreen;
+        Escenario2 game = new Escenario2(frame);
 
-        frame.dispose();
+        frame.add(game);
+        frame.pack();
 
-        if (fullscreen) {
-
-            frame.setUndecorated(true);
-            device.setFullScreenWindow(frame);
-
-        } else {
-
-            device.setFullScreenWindow(null);
-
-            frame.setUndecorated(false);
-            frame.setSize(1440, 900);
-            frame.setLocationRelativeTo(null);
-        }
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setResizable(false);
 
         frame.setVisible(true);
 
-        SwingUtilities.invokeLater(() -> requestFocusInWindow());
+        game.requestFocusInWindow();
     }
 }
