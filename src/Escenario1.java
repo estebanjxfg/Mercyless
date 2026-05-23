@@ -13,7 +13,7 @@ public class Escenario1 extends JPanel
     JFrame frame;
 
     // =========================
-    // JUGADOR
+    // JUGADORwwds
     // =========================
     Player player = new Player();
 
@@ -31,7 +31,7 @@ public class Escenario1 extends JPanel
 
         this.frame = frame;
 
-        setPreferredSize(new Dimension(640, 480));
+        setPreferredSize(new Dimension(1440, 900));
 
         setBackground(Color.BLACK);
 
@@ -61,10 +61,41 @@ public class Escenario1 extends JPanel
     // =========================
     // UPDATE
     // =========================
-    public void update() {
+    // =========================
+// UPDATE
+// =========================
+public void update() {
 
-        player.update();
+    player.update();
+
+    // =========================
+    // COLISIONES BORDES MAPA
+    // =========================
+
+    // Izquierda
+    if(player.x < 60){
+
+        player.x = 60;
     }
+
+    // Arriba
+    if(player.y < 160){
+
+        player.y = 160;
+    }
+
+    // Derecha
+    if(player.x > background.getWidth() - 220){
+
+        player.x = background.getWidth() - 220;
+    }
+
+    // Abajo
+    if(player.y > background.getHeight() - 310){
+
+        player.y = background.getHeight() - 310;
+    }
+}
 
     // =========================
     // PANTALLA COMPLETA
@@ -92,7 +123,7 @@ public class Escenario1 extends JPanel
 
             frame.setUndecorated(false);
 
-            frame.setSize(640, 480);
+            frame.setSize(1440, 900);
 
             frame.setLocationRelativeTo(null);
 

@@ -9,7 +9,7 @@ public class Player {
     public int y = 500;
 
     // Velocidad
-    public int speed = 4;
+    public int speed = 7;
 
     // Movimiento
     public boolean up, down, left, right;

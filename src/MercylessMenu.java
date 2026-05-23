@@ -101,28 +101,28 @@ public class MercylessMenu extends JFrame {
         });
 
         // =========================
-        // BOTÓN PLAY
-        // =========================
-        btnPlay.addActionListener(new ActionListener() {
+// BOTÓN PLAY
+// =========================
+btnPlay.addActionListener(new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
+    @Override
+    public void actionPerformed(ActionEvent e) {
 
-                // Crear juego
-                PersonajeMov juego =
-                        new PersonajeMov(MercylessMenu.this);
+        // Crear escenario
+        Escenario1 juego =
+                new Escenario1(MercylessMenu.this);
 
-                // Cambiar contenido
-                setContentPane(juego);
+        // Cambiar contenido
+        setContentPane(juego);
 
-                revalidate();
+        revalidate();
 
-                repaint();
+        repaint();
 
-                // Dar foco
-                juego.requestFocusInWindow();
-            }
-        });
+        // Dar foco
+        juego.requestFocusInWindow();
+    }
+});
 
         // =========================
         // BOTÓN OPTIONS
