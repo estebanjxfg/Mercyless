@@ -69,8 +69,41 @@ public class PersonajeMov extends JPanel implements KeyListener, Runnable {
     BufferedImage playerLeft;
     BufferedImage playerRight;
 
+    // NPC
+    BufferedImage npcSprite;
+
     // Sprite actual
     BufferedImage currentSprite;
+
+    // =========================
+    // NPC
+    // =========================
+    int npcX = 900;
+    int npcY = 900;
+
+    // =========================
+    // DIALOGOS
+    // =========================
+    boolean showingDialogue = false;
+
+    String[] dialogues = {
+            "Hola humano.",
+            "Bienvenido a Mercyless.",
+            "Este sistema es de prueba para comprobar "
+            + "funcionamiento de dialogos y bla bla bla."
+    };
+
+    int dialogueIndex = 0;
+
+    String currentText = "";
+
+    int textIndex = 0;
+
+    boolean textFinished = false;
+
+    long lastCharTime = 0;
+
+    int textSpeed = 30;
 
     // =========================
     // COLISIONES
@@ -100,8 +133,10 @@ public class PersonajeMov extends JPanel implements KeyListener, Runnable {
 
         // Parte circular abajo
         new Rectangle(720, 1720, 600, 90)
+           
+            
     };
-
+    
     // =========================
     // CONSTRUCTOR
     // =========================
@@ -162,6 +197,10 @@ public class PersonajeMov extends JPanel implements KeyListener, Runnable {
                     getClass().getResource("/Sprites/player_right.png")
             );
 
+            npcSprite = ImageIO.read(
+                    getClass().getResource("/Sprites/npc.png")
+            );
+
             currentSprite = playerDown;
 
         } catch (Exception e) {
@@ -193,20 +232,116 @@ public class PersonajeMov extends JPanel implements KeyListener, Runnable {
         );
 
         // Personaje
-        g.drawImage(
-                currentSprite,
-                x - cameraX,
-                y - cameraY,
-                64,
-                64,
-                null
-        );
+g.drawImage(
+        currentSprite,
+        x - cameraX,
+        y - cameraY,
+        64,
+        64,
+        null
+);
+
+// NPC
+g.drawImage(
+        npcSprite,
+        npcX - cameraX,
+        npcY - cameraY,
+        96,
+        96,
+        null
+);
+
+        // =========================
+        // DIALOGO TIPO UNDERTALE
+        // =========================
+        if (showingDialogue) {
+
+            g.setColor(Color.BLACK);
+
+            g.fillRect(40, 330, 560, 120);
+
+            g.setColor(Color.WHITE);
+
+            g.drawRect(40, 330, 560, 120);
+
+            g.setFont(new Font("Monospaced", Font.BOLD, 22));
+
+            // ==========================
+// TEXTO CON SALTO DE LÍNEA
+// ==========================
+
+FontMetrics fm = g.getFontMetrics();
+
+int lineHeight = fm.getHeight();
+
+int maxWidth = 500;
+
+String[] words = currentText.split(" ");
+
+String line = "";
+
+int yText = 370;
+
+for (String word : words) {
+
+    String testLine = line + word + " ";
+
+    int width = fm.stringWidth(testLine);
+
+    if (width > maxWidth) {
+
+        g.drawString(line, 60, yText);
+
+        line = word + " ";
+
+        yText += lineHeight;
+
+    } else {
+
+        line = testLine;
+    }
+}
+
+// Última línea
+g.drawString(line, 60, yText);
+        }
     }
 
     // =========================
     // UPDATE
     // =========================
     public void update() {
+
+        // =========================
+        // TEXTO LETRA POR LETRA
+        // =========================
+        if (showingDialogue) {
+
+            if (!textFinished) {
+
+                long currentTime = System.currentTimeMillis();
+
+                if (currentTime - lastCharTime > textSpeed) {
+
+                    String fullText = dialogues[dialogueIndex];
+
+                    if (textIndex < fullText.length()) {
+
+                        currentText += fullText.charAt(textIndex);
+
+                        textIndex++;
+
+                        lastCharTime = currentTime;
+
+                    } else {
+
+                        textFinished = true;
+                    }
+                }
+            }
+
+            return;
+        }
 
         int nextX = x;
 
@@ -257,6 +392,22 @@ public class PersonajeMov extends JPanel implements KeyListener, Runnable {
                 break;
             }
         }
+        // ==========================
+    // COLISIÓN NPC
+    // ==========================
+
+Rectangle npcCollision =
+        new Rectangle(
+                npcX + 20,
+                npcY +20,
+                28,
+                35
+        );
+
+if (playerHitbox.intersects(npcCollision)) {
+
+    collision = true;
+}
 
         // Solo mover si NO hay colisión
         if (!collision) {
@@ -365,6 +516,75 @@ public class PersonajeMov extends JPanel implements KeyListener, Runnable {
     public void keyPressed(KeyEvent e) {
 
         int tecla = e.getKeyCode();
+
+        // =========================
+        // INTERACTUAR NPC
+        // =========================
+        if  (tecla == KeyEvent.VK_E ||
+    tecla == KeyEvent.VK_Z ||
+    tecla == KeyEvent.VK_ENTER) {
+
+            Rectangle playerBox =
+                    new Rectangle(x, y, 64, 64);
+
+            Rectangle npcBox =
+        new Rectangle(
+                npcX + 20,
+                npcY + 20,
+                55,
+                70
+        );
+
+            // Abrir diálogo
+            if (!showingDialogue &&
+                    playerBox.intersects(npcBox)) {
+
+                showingDialogue = true;
+
+                dialogueIndex = 0;
+
+                currentText = "";
+
+                textIndex = 0;
+
+                textFinished = false;
+
+                return;
+            }
+
+            // Completar texto instantáneamente
+            if (showingDialogue && !textFinished) {
+
+                currentText = dialogues[dialogueIndex];
+
+                textIndex = currentText.length();
+
+                textFinished = true;
+
+                return;
+            }
+
+            // Siguiente diálogo
+            if (showingDialogue && textFinished) {
+
+                dialogueIndex++;
+
+                if (dialogueIndex >= dialogues.length) {
+
+                    showingDialogue = false;
+
+                } else {
+
+                    currentText = "";
+
+                    textIndex = 0;
+
+                    textFinished = false;
+                }
+
+                return;
+            }
+        }
 
         // =========================
         // CONTROLES WASD

@@ -153,7 +153,7 @@ public class MercylessMenu extends JFrame {
 
                 JOptionPane.showMessageDialog(
                         null,
-                        "MERCYLESS\n\nDesarrollado por Tilin Studios 😎"
+                        "MERCYLESS\n\nDesarrollado por Pandilla Momera Studios 😎"
                 );
             }
         });
