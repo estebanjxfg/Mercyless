@@ -17,7 +17,7 @@ public class Escenario1 extends JPanel implements KeyListener, Runnable {
     // =========================
     // PUERTA
     // =========================
-    Rectangle puerta = new Rectangle(900, 300, 120, 160);
+    Rectangle puerta = new Rectangle(460, 600, 120, 160);
 
     boolean cercaPuerta = false;
 
@@ -61,14 +61,14 @@ public class Escenario1 extends JPanel implements KeyListener, Runnable {
         // =========================
         // COLISIONES MAPA
         // =========================
-        if (player.x < 60) player.x = 60;
+        if (player.x < 40) player.x = 40;
         if (player.y < 160) player.y = 160;
 
-        if (player.x > background.getWidth() - 220)
-            player.x = background.getWidth() - 220;
+        if (player.x > background.getWidth() - 650)
+            player.x = background.getWidth() - 650;
 
-        if (player.y > background.getHeight() - 310)
-            player.y = background.getHeight() - 310;
+        if (player.y > background.getHeight() - 700)
+            player.y = background.getHeight() - 700;
 
         // =========================
         // HITBOX PLAYER
@@ -99,16 +99,26 @@ public class Escenario1 extends JPanel implements KeyListener, Runnable {
     // =========================
     // CAMBIO DE ESCENA
     // =========================
-    public void cambiarEscena() {
+    private boolean escenaCambiada = false;
 
-        Escenario2 escena2 = new Escenario2(frame);
-
-        frame.setContentPane(escena2);
-        frame.revalidate();
-        frame.repaint();
-
-        escena2.requestFocusInWindow();
+public void cambiarEscena() {
+    // 1. Verificas si ya se cambió la escena
+    if (escenaCambiada) {
+        return; // Termina la ejecución del método aquí
     }
+
+    // 2. Si no se ha cambiado, ejecutas tu código normal
+    Escenario2 escena2 = new Escenario2(frame);
+
+    frame.setContentPane(escena2);
+    frame.revalidate();
+    frame.repaint();
+
+    escena2.requestFocusInWindow();
+
+    // 3. Marcas la bandera como verdadera para bloquear futuros intentos
+    escenaCambiada = true; 
+}
 
     // =========================
     // DIBUJO
