@@ -42,11 +42,6 @@ public class PersonajeMov extends JPanel implements KeyListener, Runnable {
     boolean up, down, left, right;
 
     // =========================
-    // PANTALLA COMPLETA
-    // =========================
-    boolean fullscreen = false;
-
-    // =========================
     // VENTANA
     // =========================
     JFrame frame;
@@ -133,10 +128,8 @@ public class PersonajeMov extends JPanel implements KeyListener, Runnable {
 
         // Parte circular abajo
         new Rectangle(720, 1720, 600, 90)
-           
-            
     };
-    
+
     // =========================
     // CONSTRUCTOR
     // =========================
@@ -232,24 +225,24 @@ public class PersonajeMov extends JPanel implements KeyListener, Runnable {
         );
 
         // Personaje
-g.drawImage(
-        currentSprite,
-        x - cameraX,
-        y - cameraY,
-        64,
-        64,
-        null
-);
+        g.drawImage(
+                currentSprite,
+                x - cameraX,
+                y - cameraY,
+                64,
+                64,
+                null
+        );
 
-// NPC
-g.drawImage(
-        npcSprite,
-        npcX - cameraX,
-        npcY - cameraY,
-        96,
-        96,
-        null
-);
+        // NPC
+        g.drawImage(
+                npcSprite,
+                npcX - cameraX,
+                npcY - cameraY,
+                96,
+                96,
+                null
+        );
 
         // =========================
         // DIALOGO TIPO UNDERTALE
@@ -266,44 +259,40 @@ g.drawImage(
 
             g.setFont(new Font("Monospaced", Font.BOLD, 22));
 
-            // ==========================
-// TEXTO CON SALTO DE LÍNEA
-// ==========================
+            FontMetrics fm = g.getFontMetrics();
 
-FontMetrics fm = g.getFontMetrics();
+            int lineHeight = fm.getHeight();
 
-int lineHeight = fm.getHeight();
+            int maxWidth = 500;
 
-int maxWidth = 500;
+            String[] words = currentText.split(" ");
 
-String[] words = currentText.split(" ");
+            String line = "";
 
-String line = "";
+            int yText = 370;
 
-int yText = 370;
+            for (String word : words) {
 
-for (String word : words) {
+                String testLine = line + word + " ";
 
-    String testLine = line + word + " ";
+                int width = fm.stringWidth(testLine);
 
-    int width = fm.stringWidth(testLine);
+                if (width > maxWidth) {
 
-    if (width > maxWidth) {
+                    g.drawString(line, 60, yText);
 
-        g.drawString(line, 60, yText);
+                    line = word + " ";
 
-        line = word + " ";
+                    yText += lineHeight;
 
-        yText += lineHeight;
+                } else {
 
-    } else {
+                    line = testLine;
+                }
+            }
 
-        line = testLine;
-    }
-}
-
-// Última línea
-g.drawString(line, 60, yText);
+            // Última línea
+            g.drawString(line, 60, yText);
         }
     }
 
@@ -312,9 +301,7 @@ g.drawString(line, 60, yText);
     // =========================
     public void update() {
 
-        // =========================
         // TEXTO LETRA POR LETRA
-        // =========================
         if (showingDialogue) {
 
             if (!textFinished) {
@@ -344,35 +331,26 @@ g.drawString(line, 60, yText);
         }
 
         int nextX = x;
-
         int nextY = y;
 
         // Movimiento
         if (up) {
-
             nextY -= speed;
-
             currentSprite = playerUp;
         }
 
         if (down) {
-
             nextY += speed;
-
             currentSprite = playerDown;
         }
 
         if (left) {
-
             nextX -= speed;
-
             currentSprite = playerLeft;
         }
 
         if (right) {
-
             nextX += speed;
-
             currentSprite = playerRight;
         }
 
@@ -388,32 +366,30 @@ g.drawString(line, 60, yText);
             if (playerHitbox.intersects(wall)) {
 
                 collision = true;
-
                 break;
             }
         }
+
         // ==========================
-    // COLISIÓN NPC
-    // ==========================
+        // COLISIÓN NPC
+        // ==========================
+        Rectangle npcCollision =
+                new Rectangle(
+                        npcX + 20,
+                        npcY + 20,
+                        28,
+                        35
+                );
 
-Rectangle npcCollision =
-        new Rectangle(
-                npcX + 20,
-                npcY +20,
-                28,
-                35
-        );
+        if (playerHitbox.intersects(npcCollision)) {
 
-if (playerHitbox.intersects(npcCollision)) {
-
-    collision = true;
-}
+            collision = true;
+        }
 
         // Solo mover si NO hay colisión
         if (!collision) {
 
             x = nextX;
-
             y = nextY;
         }
 
@@ -447,43 +423,6 @@ if (playerHitbox.intersects(npcCollision)) {
 
         if (cameraY > worldHeight - getHeight())
             cameraY = worldHeight - getHeight();
-    }
-
-    // =========================
-    // PANTALLA COMPLETA
-    // =========================
-    public void toggleFullscreen() {
-
-        GraphicsDevice device =
-                GraphicsEnvironment
-                        .getLocalGraphicsEnvironment()
-                        .getDefaultScreenDevice();
-
-        fullscreen = !fullscreen;
-
-        frame.dispose();
-
-        if (fullscreen) {
-
-            frame.setUndecorated(true);
-
-            device.setFullScreenWindow(frame);
-
-        } else {
-
-            device.setFullScreenWindow(null);
-
-            frame.setUndecorated(false);
-
-            frame.setSize(screenWidth, screenHeight);
-
-            frame.setLocationRelativeTo(null);
-
-            frame.setVisible(true);
-        }
-
-        // RECUPERAR FOCO
-        requestFocusInWindow();
     }
 
     // =========================
@@ -521,19 +460,19 @@ if (playerHitbox.intersects(npcCollision)) {
         // INTERACTUAR NPC
         // =========================
         if  (tecla == KeyEvent.VK_E ||
-    tecla == KeyEvent.VK_Z ||
-    tecla == KeyEvent.VK_ENTER) {
+                tecla == KeyEvent.VK_Z ||
+                tecla == KeyEvent.VK_ENTER) {
 
             Rectangle playerBox =
                     new Rectangle(x, y, 64, 64);
 
             Rectangle npcBox =
-        new Rectangle(
-                npcX + 20,
-                npcY + 20,
-                55,
-                70
-        );
+                    new Rectangle(
+                            npcX + 20,
+                            npcY + 20,
+                            55,
+                            70
+                    );
 
             // Abrir diálogo
             if (!showingDialogue &&
@@ -612,9 +551,7 @@ if (playerHitbox.intersects(npcCollision)) {
 
         } else {
 
-            // =========================
             // CONTROLES FLECHAS
-            // =========================
             switch (tecla) {
 
                 case KeyEvent.VK_UP:
@@ -634,17 +571,6 @@ if (playerHitbox.intersects(npcCollision)) {
                     break;
             }
         }
-
-        // =========================
-        // F4 PANTALLA COMPLETA
-        // =========================
-        if (tecla == KeyEvent.VK_F4) {
-
-            toggleFullscreen();
-
-            // RECUPERAR FOCO
-            requestFocusInWindow();
-        }
     }
 
     // =========================
@@ -655,9 +581,7 @@ if (playerHitbox.intersects(npcCollision)) {
 
         int tecla = e.getKeyCode();
 
-        // =========================
         // CONTROLES WASD
-        // =========================
         if (ConfiguracionControles.usarWASD) {
 
             switch (tecla) {
@@ -681,9 +605,7 @@ if (playerHitbox.intersects(npcCollision)) {
 
         } else {
 
-            // =========================
             // CONTROLES FLECHAS
-            // =========================
             switch (tecla) {
 
                 case KeyEvent.VK_UP:
@@ -706,29 +628,32 @@ if (playerHitbox.intersects(npcCollision)) {
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {
+    public void keyTyped(KeyEvent e) {}
 
-    }
-
-    // =========================
-    // MAIN
-    // =========================
     public static void main(String[] args) {
 
-        JFrame frame = new JFrame("Movimiento tipo Undertale");
+    JFrame frame = new JFrame("Movimiento tipo Undertale");
 
-        PersonajeMov game = new PersonajeMov(frame);
+    // =========================
+    // FULLSCREEN
+    // =========================
+    frame.setUndecorated(true);
 
-        frame.add(game);
+    GraphicsDevice device =
+            GraphicsEnvironment
+                    .getLocalGraphicsEnvironment()
+                    .getDefaultScreenDevice();
 
-        frame.pack();
+    PersonajeMov game = new PersonajeMov(frame);
 
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.add(game);
 
-        frame.setLocationRelativeTo(null);
+    frame.pack();
 
-        frame.setResizable(false);
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        frame.setVisible(true);
-    }
+    device.setFullScreenWindow(frame);
+
+    frame.setVisible(true);
 }
+    }
