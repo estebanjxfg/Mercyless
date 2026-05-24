@@ -9,19 +9,26 @@ public class MercylessMenu extends JFrame {
     private JButton btnPlay;
     private JButton btnOptions;
     private JButton btnCredits;
-    
+
     // IMÁGENES PLAY
     private ImageIcon playNormal;
     private ImageIcon playHover;
     private ImageIcon playClick;
 
-    private boolean pantallaCompleta = false;
-
     public MercylessMenu() {
 
         setTitle("Mercyless");
-        setSize(1366, 768);
-        setLocationRelativeTo(null);
+
+        // =========================
+        // PANTALLA COMPLETA FIJA
+        // =========================
+        GraphicsDevice device =
+                GraphicsEnvironment.getLocalGraphicsEnvironment()
+                        .getDefaultScreenDevice();
+
+        setUndecorated(true);
+        device.setFullScreenWindow(this);
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         menuPanel = new JPanel() {
@@ -32,8 +39,17 @@ public class MercylessMenu extends JFrame {
 
             @Override
             protected void paintComponent(Graphics g) {
+
                 super.paintComponent(g);
-                g.drawImage(fondo, 0, 0, getWidth(), getHeight(), this);
+
+                g.drawImage(
+                        fondo,
+                        0,
+                        0,
+                        getWidth(),
+                        getHeight(),
+                        this
+                );
             }
         };
 
@@ -49,9 +65,14 @@ public class MercylessMenu extends JFrame {
 
         actualizarBotones();
 
+        // =========================
+        // AJUSTAR BOTONES SI CAMBIA TAMAÑO
+        // =========================
         addComponentListener(new ComponentAdapter() {
+
             @Override
             public void componentResized(ComponentEvent e) {
+
                 actualizarBotones();
             }
         });
@@ -64,6 +85,7 @@ public class MercylessMenu extends JFrame {
             Escenario1 juego = new Escenario1(MercylessMenu.this);
 
             setContentPane(juego);
+
             revalidate();
             repaint();
 
@@ -77,53 +99,33 @@ public class MercylessMenu extends JFrame {
 
             @Override
             public void mouseEntered(MouseEvent e) {
+
                 btnPlay.setIcon(playHover);
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
+
                 btnPlay.setIcon(playNormal);
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
+
                 btnPlay.setIcon(playClick);
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
+
                 btnPlay.setIcon(playHover);
-            }
-        });
-
-        // =========================
-        // TECLAS
-        // =========================
-        addKeyListener(new KeyAdapter() {
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-
-                if (e.getKeyCode() == KeyEvent.VK_F4) {
-
-                    pantallaCompleta = !pantallaCompleta;
-
-                    if (pantallaCompleta) {
-                        setExtendedState(JFrame.MAXIMIZED_BOTH);
-                    } else {
-                        setExtendedState(JFrame.NORMAL);
-                        setSize(1366, 768);
-                        setLocationRelativeTo(null);
-                    }
-
-                    actualizarBotones();
-                }
             }
         });
 
         setFocusable(true);
 
         setContentPane(menuPanel);
+
         requestFocusInWindow();
     }
 
@@ -133,11 +135,14 @@ public class MercylessMenu extends JFrame {
     private JButton crearBotonInvisible() {
 
         JButton b = new JButton();
+
         b.setOpaque(false);
         b.setContentAreaFilled(false);
         b.setBorderPainted(false);
         b.setFocusPainted(false);
+
         b.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
         return b;
     }
 
@@ -146,9 +151,13 @@ public class MercylessMenu extends JFrame {
     // =========================
     private ImageIcon escalarIcon(String ruta, int ancho, int alto) {
 
-        Image img = new ImageIcon(getClass().getResource(ruta))
-                .getImage()
-                .getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
+        Image img = new ImageIcon(
+                getClass().getResource(ruta)
+        ).getImage().getScaledInstance(
+                ancho,
+                alto,
+                Image.SCALE_SMOOTH
+        );
 
         return new ImageIcon(img);
     }
@@ -164,18 +173,49 @@ public class MercylessMenu extends JFrame {
         int x = (int) (ancho * 0.08);
 
         int anchoBoton = (int) (ancho * 0.31);
-        int altoBoton = (int) (alto * 0.12);
+        int altoBoton = (int) (alto * 0.13);
 
-        btnPlay.setBounds(x, (int)(alto * 0.41), anchoBoton, altoBoton);
-        btnOptions.setBounds(x, (int)(alto * 0.61), anchoBoton, altoBoton);
-        btnCredits.setBounds(x, (int)(alto * 0.75), anchoBoton, altoBoton);
+        btnPlay.setBounds(
+                x,
+                (int)(alto * 0.43),
+                anchoBoton,
+                altoBoton
+        );
+
+        btnOptions.setBounds(
+                x,
+                (int)(alto * 0.61),
+                anchoBoton,
+                altoBoton
+        );
+
+        btnCredits.setBounds(
+                x,
+                (int)(alto * 0.75),
+                anchoBoton,
+                altoBoton
+        );
 
         // =========================
-        // CARGA IMÁGENES ESCALADAS
+        // CARGAR IMÁGENES
         // =========================
-        playNormal = escalarIcon("/MenuBot/play_normal.png", anchoBoton, altoBoton);
-        playHover  = escalarIcon("/MenuBot/play_hover.png", anchoBoton, altoBoton);
-        playClick  = escalarIcon("/MenuBot/play_click.png", anchoBoton, altoBoton);
+        playNormal = escalarIcon(
+                "/MenuBot/play_normal.png",
+                anchoBoton,
+                altoBoton
+        );
+
+        playHover = escalarIcon(
+                "/MenuBot/play_hover.png",
+                anchoBoton,
+                altoBoton
+        );
+
+        playClick = escalarIcon(
+                "/MenuBot/play_click.png",
+                anchoBoton,
+                altoBoton
+        );
 
         btnPlay.setIcon(playNormal);
     }
@@ -184,6 +224,12 @@ public class MercylessMenu extends JFrame {
     // MAIN
     // =========================
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new MercylessMenu().setVisible(true));
+
+        SwingUtilities.invokeLater(() -> {
+
+            MercylessMenu menu = new MercylessMenu();
+
+            menu.setVisible(true);
+        });
     }
 }

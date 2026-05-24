@@ -34,6 +34,7 @@ public class Escenario2 extends JPanel implements KeyListener, Runnable {
                     getClass().getResource("/Sprites/Escenario2.jpeg")
             );
         } catch (Exception e) {
+            System.out.println("Error cargando Escenario2.jpeg");
             e.printStackTrace();
         }
 
@@ -49,17 +50,16 @@ public class Escenario2 extends JPanel implements KeyListener, Runnable {
 
         player.update();
 
+        if (background == null) return; // evita crashes
+
         // =========================
         // COLISIONES BORDES MAPA
         // =========================
-        if (player.x < 60) player.x = 60;
-        if (player.y < 160) player.y = 160;
+        player.x = Math.max(60, player.x);
+        player.y = Math.max(160, player.y);
 
-        if (player.x > background.getWidth() - 220)
-            player.x = background.getWidth() - 220;
-
-        if (player.y > background.getHeight() - 310)
-            player.y = background.getHeight() - 310;
+        player.x = Math.min(player.x, background.getWidth() - 220);
+        player.y = Math.min(player.y, background.getHeight() - 310);
 
         // =========================
         // CÁMARA
@@ -72,7 +72,7 @@ public class Escenario2 extends JPanel implements KeyListener, Runnable {
     }
 
     // =========================
-    // DIBUJO (UNDERTALE STYLE)
+    // DIBUJO
     // =========================
     @Override
     protected void paintComponent(Graphics g) {
@@ -81,15 +81,11 @@ public class Escenario2 extends JPanel implements KeyListener, Runnable {
 
         Graphics2D g2 = (Graphics2D) g;
 
-        // =========================
-        // BORDES NEGROS (LETTERBOX)
-        // =========================
         g2.setColor(Color.BLACK);
         g2.fillRect(0, 0, getWidth(), getHeight());
 
-        // =========================
-        // ESCALAR MAPA
-        // =========================
+        if (background == null) return;
+
         int bgW = background.getWidth();
         int bgH = background.getHeight();
 
@@ -103,9 +99,6 @@ public class Escenario2 extends JPanel implements KeyListener, Runnable {
         int drawX = (getWidth() - newW) / 2;
         int drawY = (getHeight() - newH) / 2;
 
-        // =========================
-        // APLICAR CÁMARA AL MUNDO
-        // =========================
         int worldX = drawX - (int) cameraX;
         int worldY = drawY - (int) cameraY;
 
@@ -129,13 +122,12 @@ public class Escenario2 extends JPanel implements KeyListener, Runnable {
     public void run() {
 
         while (true) {
-
             update();
             repaint();
 
             try {
                 Thread.sleep(16);
-            } catch (Exception e) {}
+            } catch (Exception ignored) {}
         }
     }
 
@@ -168,7 +160,7 @@ public class Escenario2 extends JPanel implements KeyListener, Runnable {
     public void keyTyped(KeyEvent e) {}
 
     // =========================
-    // MAIN (PRUEBA)
+    // MAIN SOLO PARA PRUEBA
     // =========================
     public static void main(String[] args) {
 
@@ -176,7 +168,7 @@ public class Escenario2 extends JPanel implements KeyListener, Runnable {
 
         Escenario2 game = new Escenario2(frame);
 
-        frame.add(game);
+        frame.setContentPane(game); // mejor práctica
         frame.pack();
 
         frame.setLocationRelativeTo(null);
